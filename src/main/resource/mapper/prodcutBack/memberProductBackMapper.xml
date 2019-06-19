@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hsy.compartment.productBack">
+    <select id="memberProductBackQuerySqlList" parameterType="com.hsy.compartment.sql.productBack.MemberProdcutBackSqlInDto"
+            resultType="com.hsy.compartment.sql.productBack.MemberProdcutBackSqlOutDto">
+          SELECT id,order_sn,order_product_id,product_id,product_name,member_name,
+          number,back_money,state_return,state_money,back_money_time,create_time
+          FROM member_product_back
+          <where>
+              <if test="orderSn!= null and  orderSn!=''"  >
+                 and order_sn like CONCAT('%',#{orderSn},'%')
+              </if>
+              <if test="productName!= null and  productName!=''"  >
+                 and product_name like CONCAT('%',#{productName},'%')
+              </if>
+              <if test="memberName!= null and  memberName!=''"  >
+                  and member_name like CONCAT('%',#{memberName},'%')
+              </if>
+              <if test="stateReturn!= null and  stateReturn!=''"  >
+                  and state_return = #{stateReturn}
+              </if>
+              <if test="sellerId!= null and  sellerId!=''"  >
+                  and seller_id = #{sellerId}
+              </if>
+          </where>
+    </select>
+
+    <select id="productBackDetailById" parameterType="java.lang.Integer"
+            resultType="com.hsy.compartment.sql.productBack.MemberProductBackDetailSqlOutDto">
+        SELECT id,order_sn,order_product_id,product_id,product_name,member_name,
+        number,back_money,state_return,state_money,back_money_time,
+        CONCAT_WS(address_all,address_info) AS address,logistics_name,logistics_number,question,image,opt_name,admin_opt_name
+        FROM member_product_back
+        WHERE id = #{id}
+    </select>
+
+    <update id="productStatuUpdateSql" parameterType="com.hsy.compartment.sql.productBack.ProductBackStatusUpdateSqlInDto">
+        UPDATE member_product_back
+        SET
+        <if test="stateReturn != null and stateReturn != ''">
+            state_return = #{stateReturn, jdbcType=INTEGER}
+        </if>
+        <if test="remark != null and remark != ''">
+            remark = #{remark, jdbcType=VARCHAR}
+        </if>
+        WHERE id = #{id, jdbcType=INTEGER}
+    </update>
+</mapper>

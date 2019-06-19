@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 订单管理 -->
+<mapper namespace="com.hsy.compartment.orders">
+	<!-- 查询订单列表 -->
+	<select id="OrderQuerySqlList"
+		parameterType="com.hsy.compartment.sql.order.OrderQuery.OrderQuerySqlInDto"
+		resultType="com.hsy.compartment.sql.order.OrderQuery.OrderQuerySqlOutDto">
+		SELECT
+			o.id,
+			o.order_sn,
+			o.order_type,
+			o.order_state,
+			o.seller_id,
+			o.member_id,
+			o.member_name,
+			m.nick_name,
+			o.pay_time,
+			o.payment_status,
+			o.money_order,
+			o.create_time
+		FROM
+			orders o
+		JOIN
+			member m 
+		ON
+			o.member_id = m.id
+		WHERE 
+			o.seller_id = #{sellerId, jdbcType=INTEGER}
+		<if test="orderState != null">
+		AND	
+			o.order_state = #{orderState, jdbcType=INTEGER}
+		</if>
+		ORDER BY 
+			o.pay_time desc
+	</select>
+	
+	<!-- 查询订单明细信息 -->
+	<select id="OrderDetailSqlById"
+		parameterType="java.lang.Integer"
+		resultType="com.hsy.compartment.sql.order.orderDetailQuery.OrderDetailSqlOutDto">
+		SELECT
+			o.id,
+			o.order_sn,
+			o.order_type,
+			o.order_state,
+			o.pay_time,
+			o.payment_status,
+			o.money_order,
+			o.money_product,
+			o.money_logistics,
+			o.`name`,
+			o.address_all,
+			o.address_info,
+			o.mobile,
+			o.zip_code,
+			o.logistics_name,
+			o.logistics_id,
+			o.logistics_number,
+			o.deliver_time,
+			o.create_time
+		FROM
+			orders o
+		WHERE
+			o.id = #{id, jdbcType=INTEGER}
+	</select>
+	
+	<!-- 查询订单包含的商品明细信息 -->
+	<select id="OrderDetailProductSql"
+		parameterType="java.lang.Integer"
+		resultType="com.hsy.compartment.sql.order.orderDetailQuery.OrderDetailProductSqlOutDto">
+		SELECT
+			p.product_id,
+			p.product_goods_id,
+			p.spec_info,
+			p.product_name,
+			p.product_sku,
+			p.money_price,
+			p.number,
+			p.money_amount,
+			p.money_act_single
+		FROM
+			orders_product p
+		WHERE
+			p.orders_id = #{orderId, jdbcType=INTEGER}
+	</select>
+</mapper>

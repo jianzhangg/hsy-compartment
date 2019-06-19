@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hsy.compartment.productBackLog">
+
+    <insert id="productBackLogInsertSql" parameterType="com.hsy.compartment.sql.productBackLog.ProductBackLogInsertSqlInDto">
+        INSERT INTO member_product_back_log(
+              operating_id,
+              operating_name,
+              member_product_back_id,
+              content,
+              create_time
+        )
+        VALUES (
+              #{operatingId, jdbcType=INTEGER},
+              #{operatingName, jdbcType=VARCHAR},
+              #{memberProductBackId, jdbcType=INTEGER},
+              #{content, jdbcType=VARCHAR},
+              #{createTimejdbcType=TIMESTAMP},
+        )
+
+    </insert>
+
+</mapper>

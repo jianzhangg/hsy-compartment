@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 配送人员管理 -->
+<mapper namespace="com.hsy.compartment.delivery.personnel">
+	<!-- 配送人员列表查询 -->
+	<select id="PersonnelListQuerySql"
+		parameterType="com.hsy.compartment.sql.delivery.personnel.personnelList.PersonnelListQuerySqlInDto"
+		resultType="com.hsy.compartment.sql.delivery.personnel.personnelList.PersonnelListQuerySqlOutDto">
+		SELECT
+			d.id,
+			d.full_name,
+			d.mobile_phone
+		FROM
+			delivery_personnel d
+		WHERE
+		  	d.seller_id = #{sellerId, jdbcType=INTEGER}
+		<if test="fullName != null and fullName !=''">
+		AND	
+			d.full_name like CONCAT('%',#{fullName, jdbcType=VARCHAR},'%')
+		</if>
+	</select>
+	
+	<!-- 新增配送员信息 -->
+	<insert id="PersonnelAddSql"
+		parameterType="com.hsy.compartment.sql.delivery.personnel.personnelAdd.PersonnelAddSqlInDto">
+      	INSERT INTO
+      		delivery_personnel(
+      			seller_id, 
+      			full_name,
+      			mobile_phone,
+      			create_by,
+      			create_date,
+      			last_modified_by,
+      			last_modified_date
+      		)
+      	VALUES
+      		(
+      			#{sellerId, jdbcType=INTEGER},
+      			#{fullName, jdbcType=VARCHAR},
+      			#{mobilePhone, jdbcType=VARCHAR},
+      			#{createBy, jdbcType=INTEGER},
+      			#{createDate, jdbcType=TIMESTAMP},
+      			#{lastModifiedBy, jdbcType=INTEGER},
+      			#{lastModifiedDate, jdbcType=TIMESTAMP}
+      		)
+	</insert>
+	
+	<!-- 设置配送人员负责区域 -->
+	<insert id="PersonnelSetAreasSql"
+		parameterType="java.util.List">
+		INSERT INTO
+			delivery_personnel_areas(
+				personnel_id,
+				province_id,
+				city_id,
+				area_id,
+				address_all,
+				create_by,
+      			create_date,
+      			last_modified_by,
+      			last_modified_date
+			)
+		VALUES
+			<foreach collection="list" item="item" index="index" separator=",">
+				(
+					#{item.personnelId, jdbcType=INTEGER},
+	      			#{item.provinceId, jdbcType=INTEGER},
+	      			#{item.cityId, jdbcType=INTEGER},
+	      			#{item.areaId, jdbcType=INTEGER},
+	      			#{item.addressAll, jdbcType=VARCHAR},
+	      			#{item.createBy, jdbcType=INTEGER},
+	      			#{item.createDate, jdbcType=TIMESTAMP},
+	      			#{item.lastModifiedBy, jdbcType=INTEGER},
+	      			#{item.lastModifiedDate, jdbcType=TIMESTAMP}
+      			)
+       		</foreach>
+	</insert>
+	
+	<!-- 每次设置配送人员负责区域前，先删除原本负责的区域，然后新增 -->
+	<delete id="PersonnelSetAreasDeleteSql"
+		parameterType="java.lang.Integer">
+		DELETE FROM
+			delivery_personnel_areas
+		WHERE
+			personnel_id = #{personnelId, jdbcType=INTEGER}
+	</delete>
+	
+	<!-- 根据id查询配送人员明细信息 -->
+	<select id="PersonnelDetailQuerySql"
+		parameterType="java.lang.Integer"
+		resultType="com.hsy.compartment.sql.delivery.personnel.personnelDetailQuery.PersonnelDetailQuerySqlOutDto">
+		SELECT
+			d.id,
+			d.full_name,
+			d.mobile_phone
+		FROM
+			delivery_personnel d
+		WHERE
+			d.id = #{id, jdbcType=INTEGER}
+	</select>
+	
+	<!-- 根据配送员ID查询配送员负责区域 -->
+	<select id="PersonnelAreasQuerySql"
+		parameterType="java.lang.Integer"
+		resultType="com.hsy.compartment.sql.delivery.personnel.personnelDetailQuery.PersonnelAreasQuerySqlOutDto">
+		SELECT
+			d.address_all
+		FROM
+			delivery_personnel_areas d
+		WHERE
+			d.personnel_id = #{personnelId, jdbcType=INTEGER}
+	</select>
+	
+	<!-- 区域查询 -->
+	<select id="RegionsQuerySql"
+		parameterType="java.lang.Integer"
+		resultType="com.hsy.compartment.sql.delivery.regions.RegionsQuerySqlOutDto">
+		SELECT
+			s.id,
+			s.regionName
+		FROM
+			regions s
+		WHERE
+			s.parentId = #{parentId, jdbcType=INTEGER}
+		ORDER BY s.id
+	</select>
+	
+	<!-- 配送人员更新 -->
+	<update id="PersonnelUpdateSql"
+		parameterType="com.hsy.compartment.sql.delivery.personnel.update.PersonnelUpdateSqlInDto">
+		UPDATE
+			delivery_personnel
+		SET
+			<if test="fullName != null and fullName != ''">
+				full_name = #{fullName, jdbcType=VARCHAR},
+			</if>
+			<if test="mobilePhone != null and mobilePhone != ''">
+				mobile_phone = #{mobilePhone, jdbcType=VARCHAR},
+			</if>
+			last_modified_by = #{lastModifiedBy, jdbcType=INTEGER},
+   			last_modified_date = #{lastModifiedDate, jdbcType=TIMESTAMP}
+   		WHERE
+   			id = #{id, jdbcType=INTEGER}
+	</update>
+	
+	<!-- 删除配送员信息 -->
+	<delete id="PersonnelDeleteSql"
+		parameterType="java.lang.Integer">
+		DELETE FROM
+			delivery_personnel
+		WHERE
+			id = #{id, jdbcType=INTEGER}
+	</delete>
+</mapper>

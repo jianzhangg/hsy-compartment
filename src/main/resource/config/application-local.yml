@@ -1,0 +1,49 @@
+server:
+  port: 9001
+  tomcat:
+   uri-encoding: UTF-8
+   max-threads: 2000
+eureka:
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 1
+    lease-expiration-duration-in-seconds: 2
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka/
+#     enabled: false
+spring:
+   application:
+      name: hsy-compartment
+   main: 
+      allow-bean-definition-overriding: true
+   datasource:
+      url: jdbc:mysql://192.168.11.12:3306/yxkj2019?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&useSSL=false
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      username: dzscTs
+      password: hSy3d4Fb9eiwWodkwW
+      hikari:
+         minimum-idle: 5
+         maximum-pool-size: 15
+         auto-commit: true
+         idle-timeout: 30000
+         pool-name: DatebookHikariCP
+         max-lifetime: 1800000
+         connection-timeout: 10000
+         connection-test-query: SELECT 1
+   redis:
+    database: 0
+    host: 192.168.11.32
+    password: hsy2019
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 15
+        max-wait: -1
+        max-idle: 15
+mybatis:
+  mapperLocations: classpath:mapper/**/*.xml
+  configuration:
+    mapUnderscoreToCamelCase: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+dialect: mysql

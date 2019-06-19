@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 采购管理-->
+<mapper namespace="com.hsy.compartment.purchase">
+	<!-- 查询采购单列表 -->
+	<select id="PurchaseQuerySqlList"
+		parameterType="com.hsy.compartment.sql.purchase.purchaseQuery.PurchaseQuerySqlInDto"
+		resultType="com.hsy.compartment.sql.purchase.purchaseQuery.PurchaseQuerySqlOutDto">
+		SELECT
+			o.id,
+			o.order_sn,
+			o.order_state,
+			o.money_order,
+			o.name,
+			o.mobile,
+			o.address_info,
+			o.audit_state,
+			o.create_time
+		FROM
+			orders o
+		WHERE o.source_type=2 and o.seller_id = #{sellerId, jdbcType=INTEGER}
+		<if test="orderSn != null and orderSn != ''">
+		AND 
+			o.order_sn like CONCAT('%',#{orderSn, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="orderState != null">
+		AND	
+			o.order_state = #{orderState, jdbcType=INTEGER}
+		</if>
+		<if test="auditState != null">
+		AND	
+			o.audit_state = #{auditState, jdbcType=INTEGER}
+		</if>
+	</select>
+	
+	<!-- 查询采购单明细信息 -->
+	<select id="PurchaseDetailSqlById"
+		parameterType="java.lang.Integer"
+		resultType="com.hsy.compartment.sql.purchase.purchaseDetailQuery.PurchaseDetailSqlOutDto">
+		SELECT
+			o.id,
+			o.order_sn,
+			o.order_state,
+			o.money_order,
+			o.`name`,
+			o.mobile,
+			o.address_info,
+			o.audit_state,
+			o.create_time,
+			o.deliver_time,
+			o.remark,
+			o.finish_time,
+			o.logistics_name,
+			o.logistics_number
+		FROM
+			orders o
+		WHERE
+			o.id = #{id, jdbcType=INTEGER}
+	</select>
+	
+	<!-- 查询采购单包含的商品明细信息 -->
+	<select id="PurchaseDetailProductSql"
+		parameterType="java.lang.Integer"
+		resultType="com.hsy.compartment.sql.purchase.purchaseDetailQuery.PurchaseDetailProductSqlOutDto">
+		SELECT
+			p.product_id,
+			p.product_goods_id,
+			p.spec_info,
+			p.product_name,
+			p.product_sku,
+			p.money_price,
+			p.number
+		FROM
+			orders_product p
+		WHERE
+			p.orders_id = #{orderId, jdbcType=INTEGER}
+	</select>
+	
+	<!-- 修改采购单状态为已完成的订单 -->
+	<update id="PurchaseUpdateSql"
+		parameterType="com.hsy.compartment.sql.purchase.purchaseTakeOver.PurchaseUpdateSqlInDto">
+		UPDATE
+			orders
+		SET
+			order_state=5
+   		WHERE
+   			id = #{id, jdbcType=INTEGER}
+	</update>
+	
+	<!-- 根据采购单id查询采购单列表信息 -->
+	<select id="PurchaseListProductSql"
+		parameterType="java.lang.Integer"
+		resultType="com.hsy.compartment.sql.purchase.purchaseTakeOver.PurchaseListProductSqlOutDto">
+		SELECT
+			p.seller_id,
+			p.product_goods_id,
+			p.product_id,
+			p.number
+		FROM
+			orders_product p
+		WHERE
+			p.orders_id = #{orderId, jdbcType=INTEGER}
+	</select>
+	
+</mapper>

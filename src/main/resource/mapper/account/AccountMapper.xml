@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 账户管理 -->
+<mapper namespace="com.hsy.compartment.account">
+	<select id="AccountLoginSql"
+		parameterType="com.hsy.compartment.sql.account.AccountLoginSqlInDto"
+		resultType="com.hsy.compartment.sql.account.AccountLoginSqlOutDto">
+		SELECT
+			s.id,
+			s.`password`,
+			s.state,
+			s.seller_id
+		FROM
+			seller_user s
+		WHERE 
+			s.`name` = #{username, jdbcType=VARCHAR}
+		AND
+			s.state != 3
+	</select>
+</mapper>

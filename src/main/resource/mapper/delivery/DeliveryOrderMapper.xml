@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 配送单管理 -->
+<mapper namespace="com.hsy.compartment.delivery.order">
+	<!-- 查询配送单列表信息 -->
+	<select id="DeliveryOrderQuerySql"
+		parameterType="com.hsy.compartment.sql.delivery.order.list.DeliveryOrderQuerySqlInDto"
+		resultType="com.hsy.compartment.sql.delivery.order.list.DeliveryOrderQuerySqlOutDto">
+		SELECT
+			d.id,
+			d.order_id,
+			d.delivery_order_sn,
+			d.delivery_date,
+			d.delivery_state,
+			o.order_sn,
+			o.`name`,
+			CONCAT(o.address_all,o.address_info) address,
+			p.full_name personnelName,
+			d.personnel_id,
+			d.create_date
+		FROM
+			delivery_order d
+		LEFT JOIN 
+			orders o 
+		ON
+			d.order_id = o.id
+		LEFT JOIN
+			delivery_personnel p
+		ON
+			d.personnel_id = p.id
+		WHERE
+			d.seller_id = #{sellerId, jdbcType=INTEGER}
+		<if test="deliveryOrderSn != null and deliveryOrderSn != ''">
+			AND 
+				d.delivery_order_sn like CONCAT('%',#{deliveryOrderSn, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="orderSn != null and orderSn != ''">
+			AND 
+				o.order_sn like CONCAT('%',#{orderSn, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="personnelName != null and personnelName != ''">
+			AND 
+				p.full_name like CONCAT('%',#{personnelName, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="deliveryState != null">
+			AND 
+				d.delivery_state = #{deliveryState, jdbcType=INTEGER}
+		</if>
+	</select>
+	
+	<!-- 新增自有物流配送单信息 -->
+	<insert id="DeliveryOrderHaveAddSql"
+		parameterType="java.util.List">
+		INSERT INTO
+      		delivery_order(
+      			order_id, 
+      			delivery_order_sn,
+      			personnel_id,
+      			delivery_date,
+      			delivery_state,
+      			seller_id,
+      			delivery_type,
+      			create_by,
+      			create_date,
+      			last_modified_by,
+      			last_modified_date
+      		)
+      	VALUES
+      		<foreach collection="list" item="item" index="index" separator=",">
+      			(
+	      			#{item.orderId, jdbcType=INTEGER},
+	      			#{item.deliveryOrderSn, jdbcType=VARCHAR},
+	      			#{item.personnelId, jdbcType=INTEGER},
+	      			#{item.deliveryDate, jdbcType=TIMESTAMP},
+	      			#{item.deliveryState, jdbcType=INTEGER},
+	      			#{item.sellerId, jdbcType=INTEGER},
+	      			#{item.deliveryType, jdbcType=INTEGER},
+	      			#{item.createBy, jdbcType=INTEGER},
+	      			#{item.createDate, jdbcType=TIMESTAMP},
+	      			#{item.lastModifiedBy, jdbcType=INTEGER},
+	      			#{item.lastModifiedDate, jdbcType=TIMESTAMP}
+      			)
+      		</foreach>
+	</insert>
+	
+	<!-- 生成自有物流配送单时修改订单状态 -->
+	<update id="OrderHaveUpdateStateSql"
+		parameterType="com.hsy.compartment.sql.delivery.order.haveAdd.OrderHaveUpdateStateSqlInDto">
+		
+	</update>
+</mapper>
